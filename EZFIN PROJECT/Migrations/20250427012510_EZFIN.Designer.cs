@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EZFIN_PROJECT.Migrations
 {
     [DbContext(typeof(FinanceContext))]
-    [Migration("20250426145009_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250427012510_EZFIN")]
+    partial class EZFIN
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,13 +47,19 @@ namespace EZFIN_PROJECT.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TransactionID")
+                    b.Property<int?>("TransactionID")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ExpenseID");
 
                     b.HasIndex("TransactionID")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[TransactionID] IS NOT NULL");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Expenses");
                 });
@@ -80,13 +86,19 @@ namespace EZFIN_PROJECT.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TransactionID")
+                    b.Property<int?>("TransactionID")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("RevenueID");
 
                     b.HasIndex("TransactionID")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[TransactionID] IS NOT NULL");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Revenues");
                 });
@@ -215,6 +227,12 @@ namespace EZFIN_PROJECT.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalExpenses")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalRevenue")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -374,8 +392,11 @@ namespace EZFIN_PROJECT.Migrations
                     b.HasOne("EZFIN_PROJECT.Model.Transaction", "Transaction")
                         .WithOne("Expense")
                         .HasForeignKey("EZFIN_PROJECT.Model.Expense", "TransactionID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("EZFIN_PROJECT.Model.User", null)
+                        .WithMany("Expenses")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Transaction");
                 });
@@ -385,8 +406,11 @@ namespace EZFIN_PROJECT.Migrations
                     b.HasOne("EZFIN_PROJECT.Model.Transaction", "Transaction")
                         .WithOne("Revenue")
                         .HasForeignKey("EZFIN_PROJECT.Model.Revenue", "TransactionID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("EZFIN_PROJECT.Model.User", null)
+                        .WithMany("Revenues")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Transaction");
                 });
@@ -475,6 +499,10 @@ namespace EZFIN_PROJECT.Migrations
 
             modelBuilder.Entity("EZFIN_PROJECT.Model.User", b =>
                 {
+                    b.Navigation("Expenses");
+
+                    b.Navigation("Revenues");
+
                     b.Navigation("SavingPlans");
 
                     b.Navigation("Transactions");

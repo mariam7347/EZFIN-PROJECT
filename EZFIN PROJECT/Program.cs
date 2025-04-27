@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using EZFIN_PROJECT.Data; // Use your updated namespace
 using EZFIN_PROJECT.Model;
 using Microsoft.AspNetCore.Identity;
+using EZFIN_PROJECT.Services;
 
 namespace EZFIN_PROJECT
 {
@@ -25,6 +26,7 @@ namespace EZFIN_PROJECT
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(); // Optional: Swagger for testing APIs
+            builder.Services.AddScoped<UserService>();  // Registering UserService
 
             var app = builder.Build();
 
